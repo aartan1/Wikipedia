@@ -41,14 +41,52 @@ def fetch_and_save(entities, category):
             print(f"Zaten mevcut, atlanıyor: {entity}")
             continue
             
-        try:
-            print(f"İndiriliyor: {entity}...")
-            page = wikipedia.page(entity, auto_suggest=False)
-            with open(filename, "w", encoding="utf-8") as f:
-                f.write(page.content)
-            time.sleep(1) # IP engeli yememek için
-        except Exception as e:
-            print(f"Hata ({entity}): {e}")
+        success = False
+        retries = 3 # Hata alırsak 3 kere daha deneyeceğiz
+        
+        for attempt in range(retries):
+            try:
+                # İlk denemede auto_suggest=False, başarısız olursa True ile esneklik sağla
+                suggest = False if attempt == 0 else True 
+                
+                print(f"İndiriliyor: {entity}" + (f" (Deneme {attempt + 1})" if attempt > 0 else "...") )
+                page = wikipedia.page(entity, auto_suggest=suggest)
+                
+                with open(filename, "w", encoding="utf-8") as f:
+                    f.write(page.content)
+                    
+                time.sleep(1.5) # IP engeli yememek için süreyi çok az artırdık
+                success = True
+                break # Başarılı olduysa deneme döngüsünden çık
+                
+            except wikipedia.exceptions.DisambiguationError as e:
+                print(f"Çoklu anlam bulundu ({entity}). İlk seçenek indiriliyor: {e.options[0]}")
+                try:
+                    page = wikipedia.page(e.options[0], auto_suggest=False)
+                    with open(filename, "w", encoding="utf-8") as f:
+                        f.write(page.content)
+                    time.sleep(1.5)
+                    success = True
+                    break
+                except Exception as inner_e:
+                    print(f"Alt seçenek de indirilemedi ({entity}): {inner_e}")
+                    break # Çoklu anlamda da hata verirse zorlama, diğer kelimeye geç
+                    
+            except wikipedia.exceptions.PageError:
+                print(f"Hata ({entity}): Wikipedia'da böyle bir sayfa bulunamadı!")
+                break # Sayfa gerçekten yoksa tekrar denemeye gerek yok
+                
+            except Exception as e:
+                # API limitine takıldıysak veya JSON parse hatası aldıysak
+                if attempt < retries - 1:
+                    print(f"Uyarı ({entity}): API hatası alındı. 3 saniye beklenip tekrar denenecek...")
+                    time.sleep(3) # Hata alınca API'yi rahatlatmak için daha uzun bekle
+                else:
+                    print(f"Bilinmeyen Hata ({entity}): {e}")
+        
+        if not success:
+            print(f"!!! {entity} atlandı.")
+
 
 print("--- Wikipedia'dan Veri Çekme Başlıyor ---")
 fetch_and_save(people, "people")

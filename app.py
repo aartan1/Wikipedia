@@ -74,8 +74,9 @@ if prompt := st.chat_input("E.g., Who is Albert Einstein and what is he known fo
         with st.spinner("Searching and thinking..."):
             context = retrieve_context(prompt)
             
-            llm_prompt = f"""You are a helpful and detailed AI assistant. Based ONLY on the following context, provide a comprehensive and informative answer to the user's question. Extract the most important facts. Write at least 2-3 sentences.
-If the answer is not contained in the context, you MUST say exactly "I don't know". Do not make up information.
+            # Eski, çok sert olan prompt yerine bu yumuşatılmış versiyonu kullan
+            llm_prompt = f"""You are a helpful AI assistant. Answer the user's question using ONLY the provided Context below. Extract the most important facts and write a detailed answer of at least 2-3 sentences.
+If the provided context does not have enough information to answer the question, politely say "I don't have enough information about this in my context."
 
 Context:
 {context}

@@ -149,8 +149,12 @@ The tower has been used for making radio transmissions since the beginning of th
 === FM radio ===
 
 
-=== Digital television ===
+=== Analogue television ===
 A television antenna was first installed on the tower in 1957, increasing its height by 18.7 m (61 ft). Work carried out in 2000 added a further 5.3 m (17 ft), giving a total height of 324 m (1,063 ft). Analogue television signals from the Eiffel Tower ceased on 8 March 2011.
+
+
+=== Digital Television ===
+Since 31 March 2005, digital terrestrial television (DTT) has been broadcast from the Eiffel Tower.
 
 
 == Dimensions ==
